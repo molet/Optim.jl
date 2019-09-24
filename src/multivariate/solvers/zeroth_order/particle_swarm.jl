@@ -2,6 +2,7 @@ struct ParticleSwarm{T} <: ZerothOrderOptimizer
     lower::Vector{T}
     upper::Vector{T}
     n_particles::Int
+    all_from_init::Bool
 end
 
 """
@@ -10,13 +11,15 @@ end
 ```julia
 ParticleSwarm(; lower = [],
                 upper = [],
-                n_particles = 0)
+                n_particles = 0
+                all_from_init = false)
 ```
 
 The constructor takes 3 keywords:
 * `lower = []`, a vector of lower bounds, unbounded below if empty or `Inf`'s
 * `upper = []`, a vector of upper bounds, unbounded above if empty or `Inf`'s
 * `n_particles = 0`, the number of particles in the swarm, defaults to least three
+* `all_from_init = false`, whether all particles start from the same initial state
 
 ## Description
 The Particle Swarm implementation in Optim.jl is the so-called Adaptive Particle
@@ -30,7 +33,7 @@ of slower convergence, but hopefully converges to the global optimum as a result
 ## References
 - [1] Zhan, Zhang, and Chung. Adaptive particle swarm optimization, IEEE Transactions on Systems, Man, and Cybernetics, Part B: CyberneticsVolume 39, Issue 6 (2009): 1362-1381
 """
-ParticleSwarm(; lower = [], upper = [], n_particles = 0) = ParticleSwarm(lower, upper, n_particles)
+ParticleSwarm(; lower = [], upper = [], n_particles = 0, all_from_init = false) = ParticleSwarm(lower, upper, n_particles, all_from_init)
 
 Base.summary(::ParticleSwarm) = "Particle Swarm"
 
@@ -129,8 +132,8 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
         for i in 1:n_particles
             for j in 1:n
                 if i == 1
-                    if abs(initial_x[i]) > T(0)
-                        dx[j] = abs(initial_x[i])
+                    if abs(initial_x[j]) > T(0)
+                        dx[j] = abs(initial_x[j])
                     else
                         dx[j] = T(1)
                     end
@@ -145,6 +148,14 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
     for j in 1:n
         X[j, 1] = initial_x[j]
         X_best[j, 1] = initial_x[j]
+    end
+    if (!limit_search_space) && method.all_from_init
+        for i in 2:n_particles
+            for j in 1:n
+                X[j, i] = initial_x[j]
+                X_best[j, i] = initial_x[j]
+            end
+        end
     end
     ParticleSwarmState(
         x,
