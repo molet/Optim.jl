@@ -142,7 +142,7 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
                 end
                 X[j, i] = initial_x[j] + dx[j] * (rand(T) * T(2) - T(1)) * T(method.delta)
                 X_best[j, i] = X[j, i]
-                V[j, i] = abs(X[j, i]) * (rand(T) * T(2) - T(1))
+                V[j, i] = abs(X[j, i]) * (rand(T) * T(2) - T(1)) * T(method.delta)
             end
         end
     end
