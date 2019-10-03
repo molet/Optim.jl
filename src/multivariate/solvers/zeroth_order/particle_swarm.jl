@@ -34,8 +34,8 @@ of slower convergence, but hopefully converges to the global optimum as a result
 ## References
 - [1] Zhan, Zhang, and Chung. Adaptive particle swarm optimization, IEEE Transactions on Systems, Man, and Cybernetics, Part B: CyberneticsVolume 39, Issue 6 (2009): 1362-1381
 """
-ParticleSwarm(; lower = [], upper = [], n_particles = 0, all_from_init = false, delta = 1.0) = ParticleSwarm(lower, upper, n_particles, all_from_init, delta)
-ParticleSwarm(lower, upper, n_particles) = ParticleSwarm(lower, upper, n_particles, false, 1.0) # this needs to pass original tests
+ParticleSwarm(; lower = [], upper = [], n_particles = 0, all_from_init = false, delta = 0.0) = ParticleSwarm(lower, upper, n_particles, all_from_init, delta)
+ParticleSwarm(lower, upper, n_particles) = ParticleSwarm(lower, upper, n_particles, false, 0.0) # this needs to pass original tests
 
 Base.summary(::ParticleSwarm) = "Particle Swarm"
 
@@ -140,9 +140,9 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
                         dx[j] = T(1)
                     end
                 end
-                X[j, i] = initial_x[j] + dx[j] * (rand(T) * T(2) - T(1)) * T(method.delta)
+                X[j, i] = initial_x[j] + dx[j] * (rand(T) * T(2) - T(1))
                 X_best[j, i] = X[j, i]
-                V[j, i] = abs(X[j, i]) * (rand(T) * T(2) - T(1)) * T(method.delta)
+                V[j, i] = abs(X[j, i]) * (rand(T) * T(2) - T(1))
             end
         end
     end
@@ -150,14 +150,14 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
     for j in 1:n
         X[j, 1] = initial_x[j]
         X_best[j, 1] = initial_x[j]
-        V[j, 1] = abs(initial_x[j]) * (rand(T) * T(2) - T(1)) * T(method.delta)
+        V[j, 1] = abs(initial_x[j]) * (rand(T) * T(2) - T(1))
     end
     if (!limit_search_space) && method.all_from_init
         for i in 2:n_particles
             for j in 1:n
-                X[j, i] = initial_x[j]
-                X_best[j, i] = initial_x[j]
-                V[j, i] = abs(initial_x[j]) * (rand(T) * T(2) - T(1)) * T(method.delta)
+                X[j, i] = initial_x[j] + (rand(T) * T(2) - T(1)) * T(method.delta)
+                X_best[j, i] = X[j, i]
+                V[j, i] = abs(initial_x[j]) * (rand(T) * T(2) - T(1))
             end
         end
     end
