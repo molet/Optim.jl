@@ -148,12 +148,14 @@ function initial_state(method::ParticleSwarm, options, d, initial_x::AbstractArr
     for j in 1:n
         X[j, 1] = initial_x[j]
         X_best[j, 1] = initial_x[j]
+        V[j, 1] = abs(initial_x[j]) * (rand(T) * T(2) - T(1))
     end
     if (!limit_search_space) && method.all_from_init
         for i in 2:n_particles
             for j in 1:n
                 X[j, i] = initial_x[j]
                 X_best[j, i] = initial_x[j]
+                V[j, i] = abs(initial_x[j]) * (rand(T) * T(2) - T(1))
             end
         end
     end
